@@ -1,0 +1,81 @@
+import org.springframework.context.ApplicationContext; 
+import org.springframework.context.annotation.*; 
+import javax.annotation.PostConstruct; 
+import javax.annotation.PreDestroy; 
+// Service Interface 
+interface PaymentService { 
+void processPayment(); 
+} 
+// Implementation of the PaymentService 
+class CreditCardPaymentService implements PaymentService { 
+@Override 
+public void processPayment() { 
+System.out.println("Processing payment using Credit Card"); 
+} 
+} 
+class PayPalPaymentService implements PaymentService { 
+@Override 
+public void processPayment() { 
+System.out.println("Processing payment using PayPal"); 
+} 
+} 
+// Consumer class that depends on PaymentService 
+class OrderService { 
+private PaymentService paymentService; 
+// Constructor-based Dependency Injection 
+public OrderService(PaymentService paymentService) { 
+this.paymentService = paymentService; 
+} 
+public void placeOrder() { 
+System.out.println("Placing order..."); 
+paymentService.processPayment(); 
+} 
+@PostConstruct 
+public void init() { 
+System.out.println("OrderService initialized."); 
+} 
+@PreDestroy 
+public void destroy() { 
+System.out.println("OrderService destroyed."); 
+} 
+} 
+// Configuration class for defining beans 
+@Configuration 
+class AppConfig { 
+// Define PaymentService bean 
+@Bean 
+@Scope("singleton") 
+public PaymentService creditCardPaymentService() { 
+return new CreditCardPaymentService(); 
+} 
+@Bean 
+@Scope("prototype") 
+public PaymentService payPalPaymentService() { 
+return new PayPalPaymentService(); 
+} 
+// Define OrderService bean with dependency injection 
+@Bean 
+public OrderService orderService(PaymentService paymentService) { 
+return new OrderService(paymentService); 
+} 
+} 
+// Main class to test bean configuration and management 
+public class BeanConfigurationExample { 
+public static void main(String[] args) { 
+// Initialize the application context 
+ApplicationContext context = new 
+AnnotationConfigApplicationContext(AppConfig.class); 
+// Get the OrderService bean with a CreditCardPaymentService dependency 
+OrderService orderService = context.getBean(OrderService.class); 
+orderService.placeOrder(); 
+// Test prototype scope for PayPalPaymentService 
+PaymentService payPal1 = context.getBean("payPalPaymentService", 
+PaymentService.class); 
+PaymentService payPal2 = context.getBean("payPalPaymentService", 
+PaymentService.class); 
+System.out.println("Are both PayPalPaymentService instances the same? " + (payPal1 
+== payPal2)); // Should print false 
+// Close the context 
+((AnnotationConfigApplicationContext) context).close(); 
+} 
+}
