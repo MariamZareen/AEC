@@ -1,0 +1,43 @@
+import React, { useState, useEffect } from "react";
+const InputValidationApp = () => {
+ // State to store the input value and validation message
+ const [inputValue, setInputValue] = useState("");
+ const [validationMessage, setValidationMessage] = useState("");
+ // Function to handle input change
+ const handleChange = (event) => {
+ setInputValue(event.target.value);
+ };
+ // useEffect to validate the input on every change
+ useEffect(() => {
+ if (inputValue.length === 0) {
+ setValidationMessage("Input is required.");
+ } else if (inputValue.length < 5) {
+ setValidationMessage("Input must be at least 5 characters long.");
+ } else {
+ setValidationMessage("Input is valid!");
+ }
+
+}, [inputValue]); // Dependency array ensures this runs whenever inputValue changes
+return (
+<div style={{ textAlign: "center", marginTop: "50px" }}>
+<h1>React Input Validation with useEffect</h1>
+{/* Input Field */}
+<input
+type="text"
+value={inputValue}
+onChange={handleChange}
+placeholder="Type something..."
+style={{ padding: "10px", fontSize: "16px", width: "300px" }}
+/>
+{/* Validation Message */}
+<div style={{ marginTop: "20px" }}>
+<p style={{ fontSize: "18px", color: validationMessage === "Input is valid!" ? "green" :
+"red" }}>
+{validationMessage}
+
+</p>
+ </div>
+ </div>
+ );
+};
+export default InputValidationApp;
