@@ -1,43 +1,29 @@
-interface MessageService {
-    void sendMessage(String message, String receiver);
-   }
-   // Email implementation of the service
-   class EmailService implements MessageService {
-    @Override
-    public void sendMessage(String message, String receiver) {
-    System.out.println("Email sent to " + receiver + " with message: " + message);
+
+  interface MsgService {
+    void send(String msg, String to);
+}
+
+class EmailService implements MsgService {
+    public void send(String msg, String to) {
+        System.out.println("Email sent to " + to + ": " + msg);
     }
-   }
-   // SMS implementation of the service
-   class SMSService implements MessageService {
-    @Override
-    public void sendMessage(String message, String receiver) {
-    System.out.println("SMS sent to " + receiver + " with message: " + message);
+}
+
+class Notifier {
+    private MsgService service;
+
+    public Notifier(MsgService service) {
+        this.service = service;
     }
-   }
-// Consumer class that depends on the service
-class MessageProcessor {
-    private MessageService messageService;
-    // Constructor-based Dependency Injection
-    public MessageProcessor(MessageService messageService) {
-    this.messageService = messageService;
+
+    public void alert(String msg, String to) {
+        service.send(msg, to);
     }
-    
-    public void processMessage(String message, String receiver) {
-        messageService.sendMessage(message, receiver);
-        }
-       }
-       // Main class to test the implementation
-       public class DependencyInjectionExample {
-        public static void main(String[] args) {
-        // Injecting EmailService dependency into MessageProcessor
-        MessageService emailService = new EmailService();
-        MessageProcessor emailProcessor = new MessageProcessor(emailService);
-        emailProcessor.processMessage("Hello, Email!", "email@example.com");
-        // Injecting SMSService dependency into MessageProcessor
-        MessageService smsService = new SMSService();
-        MessageProcessor smsProcessor = new MessageProcessor(smsService);
-        smsProcessor.processMessage("Hello, SMS!", "123-456-7890");
-        }
-       }
-       
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Notifier notifier = new Notifier(new EmailService());
+        notifier.alert("Hello!", "user@example.com");
+    }
+}     
